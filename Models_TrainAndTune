@@ -1,7 +1,6 @@
-************
-Train & Tune
-ML Models
-************
+**********************
+Train & Tune ML Models
+**********************
 
 -----------------------
 Split Train & Test Data
@@ -22,6 +21,8 @@ XGBoost
 
 import xgboost as xgb
 from sklearn.model_selection import GridSearchCV
+
+#### Train initial xgb model
 
 # Instantiate model: parameters should be evaluated for each use case
 
@@ -47,6 +48,8 @@ param_grid = {
     'reg_lambda': [35, 40, 45],
     'scale_pos_weight': [1, 2, 3]
 }
+
+#### Find optimal parameters using GridSearchCV
 
 # Create GridSearchCV variable 
 
@@ -74,3 +77,28 @@ optimal_params.fit(X_train,
 # Return best values
 
 print(optimal_params.best_params_)
+
+
+#### Re-train model with optimized hyperparameters
+
+# Instanitate model with new parameters
+
+clf_xgb = xgb.XGBClassifier(objective='binary:logistic',
+                            missing=0,
+                            seed=42,
+                            early_stopping_rounds=10,
+                            eval_metric='aucpr',
+                            gamma = 0.5,
+                            learning_rate = 0.5,
+                            max_depth = 3,
+                            reg_lambda = 35,
+                            scale_pos_weight = 3,
+                            subsample = 0.9,
+                            colsample_bytree = 0.5)
+
+# Fit tuned model
+
+clf_xgb.fit(X_train,
+            y_train,
+            verbose=True,
+            eval_set=[(X_test, y_test)])
