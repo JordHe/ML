@@ -1,0 +1,41 @@
+**************************
+Evaluate Model Performance
+**************************
+
+----------------------------------------------
+Evaluate Classification Using Confusion Matrix
+----------------------------------------------
+
+#### Import Libraries
+
+from sklearn.metrics import confusion_matrix
+from sklearn.metrics import plot_confusion_matrix
+
+#### Plot confusion matrix
+
+disp = plot_confusion_matrix(clf_xgb, X_test, y_test,
+                             display_labels = ['Did not leave', 'Left'])
+disp.ax_.set_title('Confusion matrix')
+
+plt.show()
+
+#### Show precision, recall, and F1 score of the model
+
+# Create variables for true pos, false pos, true neg, false neg from confusion matrix
+
+TP = disp.confusion_matrix[0,0]
+FP = disp.confusion_matrix[0,1]
+TN = disp.confusion_matrix[1,1]
+FN = disp.confusion_matrix[1,0]
+
+# Calculate precision, recall, and F1 score and store in variables
+
+prec = TP/(TP+FP)
+rec = TP/(TP+FN)
+F1 = (2*(prec*rec))/(prec+rec)
+
+# Print results
+
+print('Precision: ', prec)
+print('Recall: ', rec)
+print('F1 score: ', F1)
