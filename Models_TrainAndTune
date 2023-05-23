@@ -1,1 +1,76 @@
+************
+Train & Tune
+ML Models
+************
 
+-----------------------
+Split Train & Test Data
+-----------------------
+
+# Import libraries
+
+from sklearn.model_selection import train_test_split
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=42)
+
+
+-------
+XGBoost
+-------
+
+# Import libraries
+
+import xgboost as xgb
+from sklearn.model_selection import GridSearchCV
+
+# Instantiate model: parameters should be evaluated for each use case
+
+clf_xgb = xgb.XGBClassifier(objective='binary:logistic', missing=0, seed=42,
+                            early_stopping_rounds=10, eval_metric='aucpr')
+
+# Trian XGBoost Model
+
+clf_xgb.fit(X_train,
+            y_train,
+            verbose=True,
+            eval_set=[(X_test, y_test)])
+            
+# Optimize Hyperparameters using Grid Search Cross Validation
+# Run model verbose first to see defauly values as starting point
+
+# Create grid of parameters to iterate through and evaluate
+
+param_grid = {
+    'max_depth': [3, 4, 5],
+    'learning_rate': [0.1, 0.5, 1],
+    'gamma': [0.5, 0.25, 0.1],
+    'reg_lambda': [35, 40, 45],
+    'scale_pos_weight': [1, 2, 3]
+}
+
+# Create GridSearchCV variable 
+
+optimal_params = GridSearchCV(
+    estimator = xgb.XGBClassifier(objective='binary:logistic',
+                                  eval_metric = 'auc',
+                                  early_stopping_rounds = 10,
+                                  seed = 42,
+                                  subsample = 0.9,
+                                  colsample_bytree = 0.5),
+    param_grid = param_grid,
+    scoring = 'roc_auc',
+    verbose = 0,
+    n_jobs = 10,
+    cv = 3
+)
+
+# Fit GridSearchCV model  
+
+optimal_params.fit(X_train,
+                   y_train,
+                   eval_set = [(X_test, y_test)],
+                   verbose = False)
+
+# Return best values
+
+print(optimal_params.best_params_)
